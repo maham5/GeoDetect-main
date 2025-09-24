@@ -1834,41 +1834,44 @@ function updateDetectionsChart(detections) {
             showStatusMessage(`Downloading ${filename}`, 'success');
         }
 
-        // Toggle fullscreen for results
-        function toggleFullscreen() {
-            const resultsContainer = document.getElementById('resultsContainer');
-            
-            if (document.querySelector('.results-fullscreen')) {
-                // Exit fullscreen
-                document.querySelector('.results-fullscreen').remove();
-                return;
-            }
+        // Toggle fullscreen for only the detected image
+function toggleFullscreen() {
+    const existingFullscreen = document.querySelector('.results-fullscreen');
+    if (existingFullscreen) {
+        existingFullscreen.remove();
+        return;
+    }
 
-            // Enter fullscreen
-            const fullscreenDiv = document.createElement('div');
-            fullscreenDiv.className = 'results-fullscreen';
-            
-            const resultGrid = document.getElementById('resultGrid').cloneNode(true);
-            resultGrid.querySelectorAll('.results-fullscreen-toggle').forEach(btn => btn.remove());
-            
-            fullscreenDiv.innerHTML = `
-                <button class="fullscreen-close" onclick="toggleFullscreen()">
-                    <i class="fas fa-times"></i>
-                </button>
-            `;
-            fullscreenDiv.appendChild(resultGrid);
-            
-            document.body.appendChild(fullscreenDiv);
-            
-            // Close on escape key
-            const escapeHandler = (e) => {
-                if (e.key === 'Escape') {
-                    toggleFullscreen();
-                    document.removeEventListener('keydown', escapeHandler);
-                }
-            };
-            document.addEventListener('keydown', escapeHandler);
+    // Sirf detected image uthao
+    const detectedImg = document.getElementById('processedImage');
+    if (!detectedImg) return;
+
+    const fullscreenDiv = document.createElement('div');
+    fullscreenDiv.className = 'results-fullscreen';
+
+    fullscreenDiv.innerHTML = `
+        <button class="fullscreen-close" onclick="toggleFullscreen()">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+
+    // Clone detected image and add
+    const imgClone = detectedImg.cloneNode(true);
+    imgClone.classList.add('fullscreen-image');
+    fullscreenDiv.appendChild(imgClone);
+
+    document.body.appendChild(fullscreenDiv);
+
+    // Escape key se close
+    const escapeHandler = (e) => {
+        if (e.key === 'Escape') {
+            toggleFullscreen();
+            document.removeEventListener('keydown', escapeHandler);
         }
+    };
+    document.addEventListener('keydown', escapeHandler);
+}
+
 
         // Check server connection
         async function checkServerConnection() {
